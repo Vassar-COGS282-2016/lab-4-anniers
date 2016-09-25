@@ -203,17 +203,20 @@ plot(possible.theta, likelihood.of.theta)
 # create a vector of x values from 0 to 100, and the corresponding vector of y values,
 # then plot these with x values on the x axis, and y values on the y axis.
 
-# answer needed here.
+x1 <- 0:100
+y1 <- 4 + 0.8*x
+plot(x1, y1)
 
 # now let's assume that the relationship between x and y isn't perfect. there's a bit of random
 # noise. add a random sample from a normal distribution with mean 0 and sd 10 to each y value.
 # hint: there are 101 y values, so you need 101 samples.
 
-# answer needed here.
+x <- 0:100
+y <- 4 + 0.8*x + rnorm(101, 0, 10)
 
 # plot the data again, with the new noisy y values.
 
-# answer needed here.
+plot(x, y)
 
 # there are three parameter values that control this plot,
 # the intercept of the line: 4
@@ -244,26 +247,47 @@ dnorm(y.observed, y.predicted, 10)
 # write the code to see how likely it is that y will be 33 when x is 29? (assuming sd = 10)
 # the correct answer is 0.03371799...
 
-# answer needed here.
+x.observed <- 29
+y.predicted <- 4 + 0.8*x.observed
+y.observed <- 33
+dnorm(y.observed, y.predicted, 10)
 
 # now generalize your solution to compute the likelihood of each value of y that you generated above.
 # in other words, write the code that takes a vector of x and y values, and returns the probability
 # of each pair given that the relationship between x and y is y <- 4 + 0.8*x and the normal distribution has an sd of 10.
 
-# answer needed here.
+x.observed <- 0:100
+y.predicted <- 4 +0.8*x
+y.observed <- 4 +0.8*x + rnorm(101, 0, 10)
+dnorm(y.observed, y.predicted, 10)
 
 # now generalize your solution one step further. write a function that takes in a vector of parameters,
 # where parameters[1] is the intercept, parameters[2] is the slope, and parameters[3] is the sd of the normal,
 # and returns the total **negative log likelihood**. remember, we want the negative log likelihood because
 # optim() will find the set of parameters that minimizes a function.
 
-# answer needed here.
+x <- 0:100
+y <- 4 + 0.8*x+ rnorm(101, 0, 10)
+
+log.likelihood <- function(parameters) {
+  intercept <- parameters[1]
+  slope <- parameters[2]
+  sd <- parameters[3]
+  if (sd < 0) {return(NA)}
+  
+  
+log.likelihood <- mapply(function(x.observed1, y.observed1){
+    return(dnorm(y.observed1, intercept + slope*x.observed1, sd, log=T))},
+    x, y)
+  return(-sum(log.likelihood))
+}
 
 # use optim() and Nelder-Mead to search for the best fitting parameters. remember to ensure that sd > 0
 # and return NA if it is not.
 
-# answer needed here.
+fit <- optim(c(1, 1, 1), log.likelihood, method = "Nelder-Mead")
+plot(x, y)
 
 # finally, plot the best fitting line on your points by using the abline() function, and the parameters that optim() found.
 
-# answer needed here.
+abline(fit$par[1], fit$par[2])
